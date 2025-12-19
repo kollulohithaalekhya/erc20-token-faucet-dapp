@@ -55,6 +55,13 @@ contract TokenFaucet is Ownable, ReentrancyGuard {
         }
         return MAX_CLAIM_AMOUNT - totalClaimed[user];
     }
+    function faucetStatus() external view returns (string memory) {
+    if (paused) {
+        return "PAUSED";
+    }
+    return "ACTIVE";
+}
+
 
     // ------------------ Core Faucet Logic ------------------
 
