@@ -5,8 +5,9 @@ const TOKEN_ADDRESS = import.meta.env.VITE_TOKEN_ADDRESS;
 
 const faucetAbi = [
   "function requestTokens()",
-  "function paused() view returns (bool)"
+  "function isPaused() view returns (bool)"
 ];
+
 
 function getProvider() {
   if (!window.ethereum) throw new Error("No wallet");

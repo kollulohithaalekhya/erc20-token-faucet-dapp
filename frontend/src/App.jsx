@@ -1,17 +1,16 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 function App() {
   const [msg, setMsg] = useState("");
 
   const claim = async () => {
-    const res = await window.__EVAL__.claim();
+    const res = await window.__EVAL__.claimTokens();
     setMsg(res);
   };
 
   const status = async () => {
-    const res = await window.__EVAL__.status();
-    setMsg(res);
+    const paused = await window.__EVAL__.isPaused();
+    setMsg(paused ? "PAUSED" : "ACTIVE");
   };
 
   return (

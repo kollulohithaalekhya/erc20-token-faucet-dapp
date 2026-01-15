@@ -12,7 +12,7 @@ contract TokenFaucet is Ownable, ReentrancyGuard {
     uint256 public constant CLAIM_AMOUNT = 100 * 10 ** 18;
     uint256 public constant MAX_CLAIM_AMOUNT = 1000 * 10 ** 18;
 
-    bool private paused;
+    bool private _paused;
 
     mapping(address => uint256) public lastClaimAt;
     mapping(address => uint256) public totalClaimed;
@@ -24,26 +24,27 @@ contract TokenFaucet is Ownable, ReentrancyGuard {
         token = Token(tokenAddress);
     }
 
-    // ------------------ Admin Controls ------------------
-
     function pause() external onlyOwner {
-        paused = true;
+        _paused = true;
         emit FaucetPaused(true);
     }
 
     function unpause() external onlyOwner {
-        paused = false;
+        _paused = false;
         emit FaucetPaused(false);
     }
 
-    function isPaused() external view returns (bool) {
-        return paused;
+    function paused() external view returns (bool) {
+        return _paused;
     }
 
-    // ------------------ View Helpers ------------------
+    function isPaused() external view returns (bool) {
+        return _paused;
+    }
 
+  
     function canClaim(address user) public view returns (bool) {
-        if (paused) return false;
+        if (_paused) return false;
         if (totalClaimed[user] + CLAIM_AMOUNT > MAX_CLAIM_AMOUNT) return false;
         if (block.timestamp < lastClaimAt[user] + COOLDOWN_TIME) return false;
         return true;
@@ -55,18 +56,16 @@ contract TokenFaucet is Ownable, ReentrancyGuard {
         }
         return MAX_CLAIM_AMOUNT - totalClaimed[user];
     }
+
     function faucetStatus() external view returns (string memory) {
-    if (paused) {
-        return "PAUSED";
+        if (_paused) {
+            return "PAUSED";
+        }
+        return "ACTIVE";
     }
-    return "ACTIVE";
-}
-
-
-    // ------------------ Core Faucet Logic ------------------
 
     function requestTokens() external nonReentrant {
-        require(!paused, "Faucet is paused");
+        require(!_paused, "Faucet is paused");
         require(
             block.timestamp >= lastClaimAt[msg.sender] + COOLDOWN_TIME,
             "Cooldown period not elapsed"
